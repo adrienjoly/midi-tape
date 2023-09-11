@@ -1648,10 +1648,20 @@ WebMidi.enable((err) => {
       addInputListeners(e.port);
     }
     setDevicesByName();
+    if (e.port.type === "input") {
+      // switch current input to this one
+      tape.inputDevice = 0
+      tape.inputDeviceName = getInputs()[0].name;
+    }
     renderStatus();
   });
   WebMidi.addListener("disconnected", function (e) {
     setDevicesByName();
+    if (e.port.type === "input") {
+      // switch current input back to its default
+      tape.inputDevice = 0
+      tape.inputDeviceName = getInputs()[0].name;
+    }
     renderStatus();
   });
 });
