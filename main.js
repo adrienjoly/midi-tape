@@ -1605,6 +1605,7 @@ setInterval(function () {
 
 localforage.getItem("tape").then(function (value) {
   if (value) {
+    console.log("Load local configuration:", value);
     tape = value;
     migrateTape(tape);
     renderSegments();
