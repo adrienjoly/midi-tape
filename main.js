@@ -429,20 +429,16 @@ function addTrackData(setStep, property, data) {
   }
 }
 
+/**
+ * Populates track.outputDevice based on track.outputDeviceName
+ * and tape.inputDevice based on tape.inputDeviceName.
+ */
 function setDevicesByName() {
-  outputs = getOutputs();
-  tape.tracks.forEach(function (track) {
-    outputs.forEach(function (output, outputIndex) {
-      if (output.name === track.outputDeviceName) {
-        track.outputDevice = outputIndex;
-      }
-    });
-  });
-  getInputs().forEach(function (input, inputIndex) {
-    if (input.name === tape.inputDeviceName) {
-      tape.inputDevice = inputIndex;
-    }
-  });
+  const outputs = getOutputs();
+  for (const track of tape.tracks) {
+    track.outputDevice = outputs.findIndex(output => output.name === track.outputDeviceName)
+  }
+  tape.inputDevice = getInputs().findIndex(input => input.name === tape.inputDeviceName)
 }
 
 function migrateTape(tape) {
