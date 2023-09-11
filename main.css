@@ -319,6 +319,20 @@ button:disabled {
   width: 100px;
 }
 
+.hint {
+  opacity: 0.5;
+  text-transform: none;
+}
+
+.key {
+  display: inline-block;
+  border: 1px solid #dedede;
+  min-width: 12px;
+  padding: 0 2px;
+  text-align: center;
+  margin: 0 1px;
+}
+
 .visually-hidden {
   clip: rect(0 0 0 0);
   clip-path: inset(50%);

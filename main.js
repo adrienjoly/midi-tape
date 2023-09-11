@@ -1096,6 +1096,9 @@ document.addEventListener("keydown", (event) => {
   let arrowBeatChange = "m" in keysPressed || "M" in keysPressed;
   let arrowQuantizeChange = "q" in keysPressed || "Q" in keysPressed;
   switch (event.key) {
+    case "Shift":
+      toggleModifierShortcuts(true);
+      break;
     case "ArrowRight":
       if (
         trackKey === false &&
@@ -1180,6 +1183,9 @@ document.addEventListener("keyup", function (event) {
     }
   }
   switch (event.key) {
+    case "Shift":
+      toggleModifierShortcuts(false);
+      break;
     case "ArrowUp":
       if (trackKey !== false) {
         tape.tracks[trackKey].outputDevice++;
@@ -1413,6 +1419,12 @@ function getStepPixelPosition(step) {
   return (step / tape.ppq) * beatWidth;
 }
 
+function toggleModifierShortcuts(on) {
+  console.log(document.getElementsByClassName("shortcut-without-modifier"));
+  [...document.getElementsByClassName("shortcut-without-modifier")].forEach(elem => {elem.style.display = on ? "none" : "inline-block"});
+  [...document.getElementsByClassName("shortcut-with-modifier")].forEach(elem => {elem.style.display = on ? "inline-block" : "none"});
+}
+
 function renderStatus() {
   document.body.classList = `${recording ? "recording" : ""} ${
     playing ? "playing" : ""
@@ -1456,7 +1468,7 @@ function renderStatus() {
   });
   document.getElementById(
     "input-device"
-  ).innerHTML = `<b>Input</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span></span>`;
+  ).innerHTML = `<b>Input</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span></span> <span class="hint">– <span class="key">i</span> + <span class="key">↑</span>/<span class="key">↓</span> to switch</span>`;
   document.getElementById(
     "input-device"
   ).children[1].innerText = getInputDevice().name;
