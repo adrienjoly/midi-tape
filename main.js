@@ -1431,7 +1431,6 @@ function getStepPixelPosition(step) {
 }
 
 function toggleModifierShortcuts(on) {
-  console.log(document.getElementsByClassName("shortcut-without-modifier"));
   [...document.getElementsByClassName("shortcut-without-modifier")].forEach(elem => {elem.style.display = on ? "none" : "inline-block"});
   [...document.getElementsByClassName("shortcut-with-modifier")].forEach(elem => {elem.style.display = on ? "inline-block" : "none"});
 }
