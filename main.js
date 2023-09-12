@@ -511,9 +511,8 @@ function migrateTape(tape) {
 
 function debounce(func, wait, immediate) {
   let timeout;
-  return function () {
+  return function (...args) {
     const context = this;
-    const args = arguments;
     const later = function () {
       timeout = null;
       if (!immediate) func.apply(context, args);
@@ -536,7 +535,9 @@ function onNoteOn(event) {
     setStep = step;
     if (quantize) {
       setStep = quantizeStep(setStep, tape.ppq / quantizeLevel);
-      const difference = Math.round((setStep - step) * (quantizeStrength / 100));
+      const difference = Math.round(
+        (setStep - step) * (quantizeStrength / 100)
+      );
       setStep = step + difference;
       justQuantized[note] = [step, setStep];
     }
@@ -762,10 +763,7 @@ function addEndMarker() {
 }
 
 function updateBpm(newBpm) {
-  if (newBpm <= 0) {
-    newBpm = 1;
-  }
-  tape.bpm = newBpm;
+  tape.bpm = newBpm <= 0 ? 1 : newBpm;
   timer.postMessage({ bpm: tape.bpm, ppq: tape.ppq });
   renderStatus();
 }
@@ -869,7 +867,9 @@ function save() {
   const element = document.createElement("a");
   element.setAttribute(
     "href",
-    `data:text/plain;charset=utf-8,${encodeURIComponent(JSON.stringify(tape, null, 2))}`
+    `data:text/plain;charset=utf-8,${encodeURIComponent(
+      JSON.stringify(tape, null, 2)
+    )}`
   );
   element.setAttribute("download", `${tape.name || "midi-tape"}.json`);
   element.style.display = "none";
@@ -900,16 +900,16 @@ function spinCassette(backwards) {
   document.getElementById("cassette").classList = "";
   if (backwards) {
     setTimeout(
-      () => (document.getElementById("cassette").classList === "spin-back")
+      () => document.getElementById("cassette").classList === "spin-back"
     );
   } else {
-    setTimeout(() => (document.getElementById("cassette").classList === "spin"));
+    setTimeout(() => document.getElementById("cassette").classList === "spin");
   }
   if (spinTimeout) {
     clearTimeout(spinTimeout);
   }
   spinTimeout = setTimeout(
-    () => (document.getElementById("cassette").classList === ""),
+    () => document.getElementById("cassette").classList === "",
     500
   );
 }
@@ -1291,7 +1291,8 @@ document.addEventListener("keyup", function (event) {
         }
         arrowQuantizeChange = true;
       } else {
-        changeTrack((currentTrack += 1));
+        currentTrack += 1;
+        changeTrack(currentTrack);
       }
       break;
     case "ArrowRight":
