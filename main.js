@@ -124,7 +124,13 @@ fakeOutput.stopNote = function (note_name, channel) {
 };
 
 fakeOutput.sendPitchBend = function (value, channel) {
-  tinySynth.pitchBend(value);
+  if (isNaN(channel)) {
+    for (let ch = 0; ch < 16; ch++) {
+      tinySynth.pitchBend(ch, value ?? 0);
+    }
+  } else {
+    tinySynth.pitchBend(channel - 1, value ?? 0);
+  }
 };
 
 fakeOutput.sendControlChange = function (name, value) {};
