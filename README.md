@@ -42,12 +42,12 @@ external device (ex: remapped numpad) possible.
 - `y` - Add/clear end point
 - `backspace/delete` - Deletes everything between start/end points
 - `shift + backspace/delete` - Deletes pitch bends and control changes between
-start/end points
+  start/end points
 - `v` - Pastes the current track's data between start/end points to current
-point
+  point
 - `V (shift+v)` - Pastes all track data between start/end points to current point
 - `i + p` - Plays and tells the input device to play. Useful for recording drum
-machines
+  machines
 - `u` - Undo (for track deletion, note deletion, recording sessions, and paste)
 - `U (shift+u)` - Redo
 - `q` - Toggle quantization
@@ -114,6 +114,7 @@ everything that's monitored. Once finished, .webm file will be downloaded. I
 would have preferred .wav, but the browser APIs for this are pretty limited.
 
 Once downloaded, you can convert the .webm file with a command like:
+
 ```
 ffmpeg -i ~/Downloads/midi-tape.webm -vn ~/Downloads/midi-tape.mp3
 ```
@@ -130,15 +131,15 @@ loss.
 ### Notes
 
 - Your input device's MIDI channel is ignored, to keep the idea that one track is
-one MIDI output device + one channel.
+  one MIDI output device + one channel.
 - A MIDI clock is sent to all outputs every quarter note.
 - Since it's JavaScript, the BPM is likely always a little off.
 - The tape runs at a resolution of 24 PPQ. Higher PPQ values make the tape run
-inconsistently.
+  inconsistently.
 - Replacing is destructive (just like a real tape) - use it wisely!
 - You will have to manage MIDI input delays yourself - for Linux, try
-installing a package like Ubuntu's `linux-lowlatency`. For Windows, try using
-ASIO4All Driver.
+  installing a package like Ubuntu's `linux-lowlatency`. For Windows, try using
+  ASIO4All Driver.
 
 ## Development
 
