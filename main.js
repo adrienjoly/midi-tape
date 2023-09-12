@@ -85,15 +85,26 @@ let fakeOutput = {
   name: "Dummy Synth",
 };
 
-fakeOutput.playNote = function (note_name, channel, options) {
-  synth.triggerAttack(note_name, Tone.context.currentTime, options.velocity ?? 1);
+const tinySynth = JZZ.synth.Tiny()
+  .or(function(){ alert('Cannot open MIDI-Out! ' + this.err()); });
+tinySynth.ch(1).program(0);  // channel 1 <- piano
+tinySynth.ch(2).program(32); // channel 2 <- bass
+tinySynth.ch(3).program(40); // channel 3 <- violin
+tinySynth.ch(4).program(55); // channel 4 <- trumpet
+
+fakeOutput.playNote = async function (note_name, channel, options) {
+  // synth.triggerAttack(note_name, Tone.context.currentTime, options.velocity ?? 1);
+  console.log('playNote', {channel, note_name,...options})
+  tinySynth.noteOn(channel, note_name, options.velocity * 127);
 };
 
 fakeOutput.stopNote = function (note_name, channel) {
   if (note_name === "all") {
-    synth.releaseAll();
+    // synth.releaseAll();    
+    tinySynth.allSoundOff(channel)
   } else {
-    synth.triggerRelease(note_name);
+    // synth.triggerRelease(note_name);
+    tinySynth.noteOff(channel, note_name);
   }
 };
 
