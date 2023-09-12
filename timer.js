@@ -1,6 +1,6 @@
-var ppq = 24;
-var bpm = 110;
-var tickRate = 60000 / (bpm * ppq);
+let ppq = 24;
+let bpm = 110;
+let tickRate = 60000 / (bpm * ppq);
 
 function tick() {
   postMessage({});

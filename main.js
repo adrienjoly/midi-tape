@@ -18,7 +18,7 @@ let step = 0;
 let startMarker = 0;
 let endMarker = 0;
 let countInTimer = 0;
-let timer = new Worker("timer.js");
+const timer = new Worker("timer.js");
 let alreadyWiped = {};
 let notesHeld = {};
 let playInput = false;
@@ -37,8 +37,8 @@ let deleteTrackChange = false;
 let lockTape = true;
 let spinTimeout;
 let maxStep = 0;
-let beatWidth = 25;
-let debounceRenderSegments = debounce(renderSegments, 100);
+const beatWidth = 25;
+const debounceRenderSegments = debounce(renderSegments, 100);
 let audioContext;
 let microphone;
 let monitor = false;
@@ -48,9 +48,9 @@ let audioChunks = [];
 let lockKeyboard = false;
 
 // A tape is data that should persist.
-let defaultOutputDevice = 0;
-let defaultOuputDeviceName = "Tiny Synth";
-let defaultOutputChannel = 1;
+const defaultOutputDevice = 0;
+const defaultOuputDeviceName = "Tiny Synth";
+const defaultOutputChannel = 1;
 let tape = {
   version: 5,
   ppq: 24,
@@ -65,12 +65,12 @@ addTrack();
 addTrack();
 addTrack();
 addTrack();
-let tapeUndo = [];
-let tapeRedo = [];
+const tapeUndo = [];
+const tapeRedo = [];
 
 // Fake MIDI devices for ease of development.
 
-let metronome_synth = new Tone.Synth({
+const metronome_synth = new Tone.Synth({
   volume: -6,
 }).toDestination();
 metronome_synth.envelope.release = 0.1;
@@ -78,12 +78,12 @@ metronome_synth.envelope.attack = 0.005;
 metronome_synth.envelope.decay = 0;
 metronome_synth.envelope.sustain = 0.1;
 
-let fakeOutput = {
+const fakeOutput = {
   name: "Tiny Synth",
 };
 
 const tinySynth = JZZ.synth.Tiny().or(function () {
-  alert("Cannot open MIDI-Out! " + this.err());
+  alert(`Cannot open MIDI-Out! ${this.err()}`);
 });
 // general midi instrument mappings for "Tiny Synth" output
 [
@@ -138,7 +138,7 @@ fakeOutput.sendControlChange = function (name, value) {};
 
 fakeOutput.sendClock = function () {};
 
-let fakeInput = {
+const fakeInput = {
   name: "Dummy Keyboard",
   id: "dummy_keyboard",
   keysHeld: {},
@@ -172,8 +172,8 @@ fakeInput.getNoteForKey = function (key) {
 fakeInput.handleKeyUp = function (key) {
   if (key === "k" || key === "l") {
     // Release all held keys.
-    for (let key in this.keysHeld) {
-      let note = this.getNoteForKey(key);
+    for (const key in this.keysHeld) {
+      const note = this.getNoteForKey(key);
       onNoteOff({
         target: {
           id: this.id,
@@ -240,7 +240,7 @@ function wipeStepData() {
     addTrackData(
       step,
       "noteOff",
-      getUnfinishedNotes().filter((note) => !note in notesHeld)
+      getUnfinishedNotes().filter((note) => !(note in notesHeld))
     );
   }
   if (
@@ -326,14 +326,14 @@ function tick() {
       return;
     }
     if (typeof track.noteOn[step] !== "undefined") {
-      for (let note in track.noteOn[step]) {
+      for (const note in track.noteOn[step]) {
         if (
           trackNumber === currentTrack &&
           (note in notesHeld || note in justQuantized)
         ) {
           continue;
         }
-        justNoteOn[trackNumber + ":" + note] = true;
+        justNoteOn[`${trackNumber}:${note}`] = true;
         getOutputDevice(trackNumber).playNote(note, track.outputChannel, {
           velocity: track.noteOn[step][note],
         });
@@ -345,7 +345,7 @@ function tick() {
           delete justQuantized[note];
           return;
         }
-        delete justNoteOn[trackNumber + ":" + note];
+        delete justNoteOn[`${trackNumber}:${note}`];
         getOutputDevice(trackNumber).stopNote(note, track.outputChannel);
       });
     }
@@ -356,7 +356,7 @@ function tick() {
       );
     }
     if (typeof track.controlchange[step] !== "undefined") {
-      for (let name in track.controlchange[step]) {
+      for (const name in track.controlchange[step]) {
         try {
           getOutputDevice(trackNumber).sendControlChange(
             name,
@@ -446,7 +446,7 @@ function removeTrack(track_number) {
 }
 
 function addTrackData(setStep, property, data) {
-  if (data == false) {
+  if (data === false) {
     return;
   }
   if (replace) {
@@ -464,7 +464,7 @@ function addTrackData(setStep, property, data) {
     if (typeof tape.tracks[currentTrack][property][setStep] === "undefined") {
       tape.tracks[currentTrack][property][setStep] = {};
     }
-    for (let note in data) {
+    for (const note in data) {
       tape.tracks[currentTrack][property][setStep][note] = data[note];
     }
   } else {
@@ -512,13 +512,13 @@ function migrateTape(tape) {
 function debounce(func, wait, immediate) {
   let timeout;
   return function () {
-    let context = this,
-      args = arguments;
-    let later = function () {
+    const context = this;
+    const args = arguments;
+    const later = function () {
       timeout = null;
       if (!immediate) func.apply(context, args);
     };
-    let callNow = immediate && !timeout;
+    const callNow = immediate && !timeout;
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
     if (callNow) func.apply(context, args);
@@ -531,12 +531,12 @@ function onNoteOn(event) {
   if (getInputDevice().id !== event.target.id) {
     return;
   }
-  let note = event.note.name + event.note.octave;
+  const note = event.note.name + event.note.octave;
   if (playing && recording && countInTimer <= 0) {
     setStep = step;
     if (quantize) {
       setStep = quantizeStep(setStep, tape.ppq / quantizeLevel);
-      let difference = Math.round((setStep - step) * (quantizeStrength / 100));
+      const difference = Math.round((setStep - step) * (quantizeStrength / 100));
       setStep = step + difference;
       justQuantized[note] = [step, setStep];
     }
@@ -546,7 +546,7 @@ function onNoteOn(event) {
     notesHeld[note] = true;
     debounceRenderSegments();
   }
-  justNoteOn[currentTrack + ":" + note] = true;
+  justNoteOn[`${currentTrack}:${note}`] = true;
   getOutputDevice(currentTrack).playNote(
     note,
     tape.tracks[currentTrack].outputChannel,
@@ -560,13 +560,13 @@ function onNoteOff(event) {
   if (getInputDevice().id !== event.target.id) {
     return;
   }
-  let note = event.note.name + event.note.octave;
+  const note = event.note.name + event.note.octave;
   if (playing && recording && countInTimer <= 0) {
     setStep = step;
     // Note lengths are not quantized, we only shift the note off events by the
     // same amount as the note on events.
     if (quantize && note in justQuantized) {
-      let diff = justQuantized[note][1] - justQuantized[note][0];
+      const diff = justQuantized[note][1] - justQuantized[note][0];
       setStep += diff;
       // tick() will delete future note offs for us.
       if (setStep <= step) {
@@ -577,7 +577,7 @@ function onNoteOff(event) {
     delete notesHeld[note];
     debounceRenderSegments();
   }
-  delete justNoteOn[currentTrack + ":" + note];
+  delete justNoteOn[`${currentTrack}:${note}`];
   getOutputDevice(currentTrack).stopNote(
     note,
     tape.tracks[currentTrack].outputChannel
@@ -620,9 +620,9 @@ function onControlChange(event) {
 // Keyboard interaction and callbacks.
 
 function getUnfinishedNotes() {
-  let noteCount = {};
-  for (let i in tape.tracks[currentTrack].noteOn) {
-    for (let note in tape.tracks[currentTrack].noteOn[i]) {
+  const noteCount = {};
+  for (const i in tape.tracks[currentTrack].noteOn) {
+    for (const note in tape.tracks[currentTrack].noteOn[i]) {
       if (!(note in noteCount)) {
         noteCount[note] = 1;
       } else {
@@ -630,7 +630,7 @@ function getUnfinishedNotes() {
       }
     }
   }
-  for (let i in tape.tracks[currentTrack].noteOff) {
+  for (const i in tape.tracks[currentTrack].noteOff) {
     tape.tracks[currentTrack].noteOff[i].forEach(function (note) {
       if (note in noteCount) {
         noteCount[note]--;
@@ -655,8 +655,8 @@ function stopAllNotes() {
   tape.tracks.forEach(function (track, trackNumber) {
     getOutputDevice(trackNumber).sendPitchBend(0);
   });
-  for (let key in justNoteOn) {
-    let parts = key.split(":");
+  for (const key in justNoteOn) {
+    const parts = key.split(":");
     getOutputDevice(parts[0]).stopNote(parts[1]);
   }
   justNoteOn = {};
@@ -807,7 +807,7 @@ function paste() {
   }
   pushUndo();
   if (replace) {
-    let lastStep = endMarker - 1 - startMarker + step;
+    const lastStep = endMarker - 1 - startMarker + step;
     for (let i = step; i <= lastStep; ++i) {
       delete tape.tracks[currentTrack].noteOn[i];
       delete tape.tracks[currentTrack].noteOff[i];
@@ -866,11 +866,10 @@ function wipeTape() {
 
 function save() {
   lockTape = true;
-  let element = document.createElement("a");
+  const element = document.createElement("a");
   element.setAttribute(
     "href",
-    "data:text/plain;charset=utf-8," +
-      encodeURIComponent(JSON.stringify(tape, null, 2))
+    `data:text/plain;charset=utf-8,${encodeURIComponent(JSON.stringify(tape, null, 2))}`
   );
   element.setAttribute("download", `${tape.name || "midi-tape"}.json`);
   element.style.display = "none";
@@ -881,10 +880,10 @@ function save() {
 }
 
 function load() {
-  let input = document.createElement("input");
+  const input = document.createElement("input");
   input.type = "file";
   input.onchange = function (event) {
-    let reader = new FileReader();
+    const reader = new FileReader();
     reader.onload = function (event) {
       lockTape = true;
       tape = JSON.parse(event.target.result);
@@ -901,16 +900,16 @@ function spinCassette(backwards) {
   document.getElementById("cassette").classList = "";
   if (backwards) {
     setTimeout(
-      () => (document.getElementById("cassette").classList = "spin-back")
+      () => (document.getElementById("cassette").classList === "spin-back")
     );
   } else {
-    setTimeout(() => (document.getElementById("cassette").classList = "spin"));
+    setTimeout(() => (document.getElementById("cassette").classList === "spin"));
   }
   if (spinTimeout) {
     clearTimeout(spinTimeout);
   }
   spinTimeout = setTimeout(
-    () => (document.getElementById("cassette").classList = ""),
+    () => (document.getElementById("cassette").classList === ""),
     500
   );
 }
@@ -919,7 +918,7 @@ function nudgeCassette(backwards) {
   if (step <= 0) {
     return;
   }
-  let reels = document.querySelectorAll(".reel-inner");
+  const reels = document.querySelectorAll(".reel-inner");
   reels.forEach(function (reel) {
     let rotation = parseInt(
       getComputedStyle(reel).getPropertyValue("--rotation")
@@ -949,7 +948,7 @@ function getPressedTrackKey() {
     return currentTrack;
   }
   let trackKey = false;
-  for (let keyPressed in keysPressed) {
+  for (const keyPressed in keysPressed) {
     trackKey = getTrackFromKey(keyPressed);
     if (trackKey !== false) {
       break;
@@ -1039,10 +1038,10 @@ function onMediaRecorderStop() {
   if (!recordAudio) {
     return;
   }
-  let blob = new Blob(audioChunks, { type: "audio/webm" });
-  let audioURL = window.URL.createObjectURL(blob);
+  const blob = new Blob(audioChunks, { type: "audio/webm" });
+  const audioURL = window.URL.createObjectURL(blob);
 
-  let element = document.createElement("a");
+  const element = document.createElement("a");
   element.setAttribute("href", audioURL);
   element.setAttribute("download", `${tape.name || "midi-tape"}.webm`);
   element.style.display = "none";
@@ -1081,19 +1080,19 @@ function toggleRecordAudio() {
 }
 
 function exportMidi() {
-  let smf = new JZZ.MIDI.SMF(0, tape.ppq);
+  const smf = new JZZ.MIDI.SMF(0, tape.ppq);
 
   calculateMaxStep();
 
   tape.tracks.forEach(function (track, trackNumber) {
-    let trk = new JZZ.MIDI.SMF.MTrk();
+    const trk = new JZZ.MIDI.SMF.MTrk();
     smf.push(trk);
     trk.add(0, JZZ.MIDI.smfBPM(tape.bpm));
 
     for (let i = 0; i <= maxStep; ++i) {
-      let midiStep = i;
+      const midiStep = i;
       if (typeof track.noteOn[i] !== "undefined") {
-        for (let note in track.noteOn[i]) {
+        for (const note in track.noteOn[i]) {
           trk.add(
             midiStep,
             JZZ.MIDI.noteOn(0, note, 127 * track.noteOn[i][note])
@@ -1109,8 +1108,8 @@ function exportMidi() {
         trk.add(midiStep, JZZ.MIDI.pitchBend(0, track.pitchbend[i]));
       }
       if (typeof track.controlchange[i] !== "undefined") {
-        for (let name in track.controlchange[i]) {
-          let controller = WebMidi.MIDI_CONTROL_CHANGE_MESSAGES[name];
+        for (const name in track.controlchange[i]) {
+          const controller = WebMidi.MIDI_CONTROL_CHANGE_MESSAGES[name];
           if (controller === undefined) {
             console.log(`Couldn't find controller for ${name}.`);
             continue;
@@ -1124,8 +1123,8 @@ function exportMidi() {
     }
   });
 
-  let element = document.createElement("a");
-  midiUrl = "data:audio/midi;base64," + btoa(smf.dump());
+  const element = document.createElement("a");
+  midiUrl = `data:audio/midi;base64,${btoa(smf.dump())}`;
   element.setAttribute("href", midiUrl);
   element.setAttribute("download", `${tape.name || "midi-tape"}.mid`);
   element.style.display = "none";
@@ -1139,9 +1138,9 @@ document.addEventListener("keydown", (event) => {
     return;
   }
   keysPressed[event.key] = true;
-  let trackKey = getPressedTrackKey();
-  let arrowBeatChange = "m" in keysPressed || "M" in keysPressed;
-  let arrowQuantizeChange = "q" in keysPressed || "Q" in keysPressed;
+  const trackKey = getPressedTrackKey();
+  const arrowBeatChange = "m" in keysPressed || "M" in keysPressed;
+  const arrowQuantizeChange = "q" in keysPressed || "Q" in keysPressed;
   switch (event.key) {
     case "Shift":
       toggleModifierShortcuts(true);
@@ -1216,7 +1215,7 @@ document.addEventListener("keyup", function (event) {
   delete keysPressed[event.key];
   delete keysPressed[event.key.toLowerCase()];
   delete keysPressed[event.key.toUpperCase()];
-  let trackKey = getPressedTrackKey();
+  const trackKey = getPressedTrackKey();
   let inputChange = false;
   let beatChange = false;
   let quantizeChange = false;
@@ -1485,7 +1484,7 @@ function renderStatus() {
   }`;
   // @todo Add this back when Chrome doesn't cache recording icon.
   // document.getElementById("favicon").href = recording ? "favicon-recording.png" : "favicon.png";
-  document.getElementById("bpm-status").innerText = tape.bpm + " BPM";
+  document.getElementById("bpm-status").innerText = `${tape.bpm} BPM`;
   document.getElementById("playing").innerText = playing ? "Playing" : "Paused";
   document.getElementById("recording").innerText = recording
     ? "Recording"
@@ -1496,7 +1495,7 @@ function renderStatus() {
   document.getElementById("metronome").innerText = metronome
     ? "Metronome on"
     : "Metronome off";
-  document.getElementById("bpb-status").innerText = tape.bpb + " BPB";
+  document.getElementById("bpb-status").innerText = `${tape.bpb} BPB`;
   document.getElementById("count-in").innerText = countIn
     ? "Count in on"
     : "Count in off";
@@ -1509,7 +1508,7 @@ function renderStatus() {
   tape.tracks.forEach(function (track, index) {
     document.getElementById(`track_${index}`).classList =
       index === currentTrack ? "track current-track" : "track";
-    let outputElem = document.createElement("div");
+    const outputElem = document.createElement("div");
     outputElem.setAttribute("id", `output-device-${index}`);
     outputElem.setAttribute("class", "output-device");
     outputElem.innerHTML = `<b>Track ${
@@ -1559,19 +1558,19 @@ function renderSegments() {
     trackElem.remove();
   });
   tape.tracks.forEach(function (track, track_number) {
-    let trackElem = document.createElement("div");
+    const trackElem = document.createElement("div");
     trackElem.setAttribute("id", `track_${track_number}`);
     trackElem.classList =
       track_number === currentTrack ? "track current-track" : "track";
     document.getElementById("timeline").appendChild(trackElem);
-    let segments = [];
-    let sortedNoteOff = Object.keys(track.noteOff)
+    const segments = [];
+    const sortedNoteOff = Object.keys(track.noteOff)
       .map(Number)
       .sort((a, b) => a - b);
-    for (let i of Object.keys(track.noteOn)
+    for (const i of Object.keys(track.noteOn)
       .map(Number)
       .sort((a, b) => a - b)) {
-      for (let j of sortedNoteOff) {
+      for (const j of sortedNoteOff) {
         if (j < i) {
           continue;
         }
@@ -1588,7 +1587,7 @@ function renderSegments() {
       }
     }
     segments.forEach(function (segment) {
-      let segmentElem = document.createElement("div");
+      const segmentElem = document.createElement("div");
       segmentElem.classList = "timeline-segment";
       left = getStepPixelPosition(segment.firstStep);
       width = getStepPixelPosition(segment.lastStep) - left;
@@ -1596,16 +1595,16 @@ function renderSegments() {
       trackElem.append(segmentElem);
     });
 
-    for (let i in track.pitchbend) {
-      let pitchElem = document.createElement("div");
+    for (const i in track.pitchbend) {
+      const pitchElem = document.createElement("div");
       pitchElem.classList = "timeline-pitchbend";
       left = getStepPixelPosition(i);
       pitchElem.style = `left: ${left}px;`;
       trackElem.append(pitchElem);
     }
 
-    for (let i in track.controlchange) {
-      let pitchElem = document.createElement("div");
+    for (const i in track.controlchange) {
+      const pitchElem = document.createElement("div");
       pitchElem.classList = "timeline-controlchange";
       left = getStepPixelPosition(i);
       pitchElem.style = `left: ${left}px;`;
@@ -1615,20 +1614,20 @@ function renderSegments() {
 }
 
 function renderTimeline() {
-  let backgroundSize = tape.bpb * beatWidth;
+  const backgroundSize = tape.bpb * beatWidth;
   // Hack to fix subpixel rendering for Macs.
   let extraStyle = "";
   if (tape.bpb <= 3) {
     extraStyle =
       "background: linear-gradient(90deg, #dedede 2%, transparent 2%) 1px 0, #1e1e1e;";
   }
-  let timelinePosition = getStepPixelPosition(step);
+  const timelinePosition = getStepPixelPosition(step);
   document.getElementById(
     "timeline"
   ).style = `${extraStyle} transform: translateX(-${timelinePosition}px); width: calc(100% + ${timelinePosition}px); background-size: ${backgroundSize}px 1px;`;
-  let counterText = String(Math.floor(step / tape.ppq)).padStart(4, "0");
+  const counterText = String(Math.floor(step / tape.ppq)).padStart(4, "0");
   document.getElementById("counter").dataset.count = counterText;
-  let renderMaxStep = maxStep;
+  const renderMaxStep = maxStep;
   if (renderMaxStep <= 0) {
     scale = 0;
   } else {
@@ -1648,11 +1647,11 @@ function renderTimeline() {
 function calculateMaxStep() {
   maxStep = 0;
   tape.tracks.forEach(function (track) {
-    let allNotes = Object.keys(track.noteOff)
+    const allNotes = Object.keys(track.noteOff)
       .concat(Object.keys(track.noteOn))
       .concat(Object.keys(track.pitchbend))
       .concat(Object.keys(track.controlchange));
-    let trackMax = Math.max(...allNotes.map(Number));
+    const trackMax = Math.max(...allNotes.map(Number));
     if (trackMax > maxStep) {
       maxStep = trackMax;
     }
