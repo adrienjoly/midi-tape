@@ -82,28 +82,29 @@ let fakeOutput = {
   name: "Tiny Synth",
 };
 
-const tinySynth = JZZ.synth.Tiny()
-  .or(function(){ alert('Cannot open MIDI-Out! ' + this.err()); });
+const tinySynth = JZZ.synth.Tiny().or(function () {
+  alert("Cannot open MIDI-Out! " + this.err());
+});
 // general midi instrument mappings for "Tiny Synth" output
 [
-  0,    // channel 1  <- acoustic grand piano
-  8,    // channel 2  <- celesta
-  16,   // channel 3  <- drawbar organ
-  25,   // channel 4  <- acoustic guitar (steel)
-  32,   // channel 5  <- acoustic bass
-  40,   // channel 6  <- violin
-  55,   // channel 7  <- trumpet
-  68,   // channel 8  <- oboe
-  72,   // channel 9 <- piccolo
+  0, // channel 1  <- acoustic grand piano
+  8, // channel 2  <- celesta
+  16, // channel 3  <- drawbar organ
+  25, // channel 4  <- acoustic guitar (steel)
+  32, // channel 5  <- acoustic bass
+  40, // channel 6  <- violin
+  55, // channel 7  <- trumpet
+  68, // channel 8  <- oboe
+  72, // channel 9 <- piccolo
   null, // channel 10  <- percussion/drums
-  80,   // channel 11 <- lead 1 (square)
-  83,   // channel 12 <- lead 4 (chiff)
-  85,   // channel 13 <- lead 6 (voice)
-  87,   // channel 14 <- lead 8 (bass + lead)
-  89,   // channel 15 <- pad 2 (warm)
-  115,  // channel 16 <- woodblock
+  80, // channel 11 <- lead 1 (square)
+  83, // channel 12 <- lead 4 (chiff)
+  85, // channel 13 <- lead 6 (voice)
+  87, // channel 14 <- lead 8 (bass + lead)
+  89, // channel 15 <- pad 2 (warm)
+  115, // channel 16 <- woodblock
 ].forEach((instrument, synthChannel) => {
-  if (synthChannel !== 9){
+  if (synthChannel !== 9) {
     tinySynth.ch(synthChannel).program(instrument);
   }
 });
@@ -282,9 +283,19 @@ function inputDeviceStop() {
 
 function playMetronome(currentStep) {
   if (currentStep % (tape.ppq * tape.bpb) === 0) {
-    metronome_synth.triggerAttackRelease("C4", 0.05, Tone.context.currentTime, 0.9);
+    metronome_synth.triggerAttackRelease(
+      "C4",
+      0.05,
+      Tone.context.currentTime,
+      0.9
+    );
   } else if (currentStep % tape.ppq === 0) {
-    metronome_synth.triggerAttackRelease("C3", 0.05, Tone.context.currentTime, 0.9);
+    metronome_synth.triggerAttackRelease(
+      "C3",
+      0.05,
+      Tone.context.currentTime,
+      0.9
+    );
   }
 }
 
@@ -468,9 +479,13 @@ function addTrackData(setStep, property, data) {
 function setDevicesByName() {
   const outputs = getOutputs();
   for (const track of tape.tracks) {
-    track.outputDevice = outputs.findIndex(output => output.name === track.outputDeviceName)
+    track.outputDevice = outputs.findIndex(
+      (output) => output.name === track.outputDeviceName
+    );
   }
-  tape.inputDevice = getInputs().findIndex(input => input.name === tape.inputDeviceName)
+  tape.inputDevice = getInputs().findIndex(
+    (input) => input.name === tape.inputDeviceName
+  );
 }
 
 function migrateTape(tape) {
@@ -1452,8 +1467,16 @@ function getStepPixelPosition(step) {
 }
 
 function toggleModifierShortcuts(on) {
-  [...document.getElementsByClassName("shortcut-without-modifier")].forEach(elem => {elem.style.display = on ? "none" : "inline-block"});
-  [...document.getElementsByClassName("shortcut-with-modifier")].forEach(elem => {elem.style.display = on ? "inline-block" : "none"});
+  [...document.getElementsByClassName("shortcut-without-modifier")].forEach(
+    (elem) => {
+      elem.style.display = on ? "none" : "inline-block";
+    }
+  );
+  [...document.getElementsByClassName("shortcut-with-modifier")].forEach(
+    (elem) => {
+      elem.style.display = on ? "inline-block" : "none";
+    }
+  );
 }
 
 function renderStatus() {
@@ -1491,7 +1514,9 @@ function renderStatus() {
     outputElem.setAttribute("class", "output-device");
     outputElem.innerHTML = `<b>Track ${
       index + 1
-    }</b>&nbsp;&nbsp;&nbsp;<span></span> <span class="hint">– <span class="key">${index + 1}</span> + <span class="key">←</span>/<span class="key">→</span> to switch</span>`;
+    }</b>&nbsp;&nbsp;&nbsp;<span></span> <span class="hint">– <span class="key">${
+      index + 1
+    }</span> + <span class="key">←</span>/<span class="key">→</span> to switch</span>`;
     outputElem.children[1].innerText = `${getOutputDevice(index).name} (${
       track.outputChannel
     })`;
@@ -1693,7 +1718,7 @@ WebMidi.enable((err) => {
     setDevicesByName();
     if (e.port.type === "input") {
       // switch current input to this one
-      tape.inputDevice = 0
+      tape.inputDevice = 0;
       tape.inputDeviceName = getInputs()[0].name;
     }
     renderStatus();
@@ -1702,7 +1727,7 @@ WebMidi.enable((err) => {
     setDevicesByName();
     if (e.port.type === "input") {
       // switch current input back to its default
-      tape.inputDevice = 0
+      tape.inputDevice = 0;
       tape.inputDeviceName = getInputs()[0].name;
     }
     renderStatus();
