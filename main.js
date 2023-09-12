@@ -114,8 +114,10 @@ fakeOutput.playNote = async function (note_name, channel, options) {
 };
 
 fakeOutput.stopNote = function (note_name, channel) {
-  if (note_name === "all") {
-    tinySynth.allSoundOff(channel - 1)
+  if (note_name === "all" && !isNaN(channel)) {
+    tinySynth.allSoundOff(channel - 1);
+  } else if (note_name === "all") {
+    tinySynth.reset();
   } else {
     tinySynth.noteOff(channel - 1, note_name);
   }
