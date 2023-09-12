@@ -1485,7 +1485,7 @@ function renderStatus() {
     outputElem.setAttribute("class", "output-device");
     outputElem.innerHTML = `<b>Track ${
       index + 1
-    }</b>&nbsp;&nbsp;&nbsp;<span></span>`;
+    }</b>&nbsp;&nbsp;&nbsp;<span></span> <span class="hint">– <span class="key">${index + 1}</span> + <span class="key">←</span>/<span class="key">→</span> to switch</span>`;
     outputElem.children[1].innerText = `${getOutputDevice(index).name} (${
       track.outputChannel
     })`;
