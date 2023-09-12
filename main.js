@@ -49,7 +49,7 @@ let lockKeyboard = false;
 
 // A tape is data that should persist.
 let defaultOutputDevice = 0;
-let defaultOuputDeviceName = "Dummy Synth";
+let defaultOuputDeviceName = "Tiny Synth";
 let defaultOutputChannel = 1;
 let tape = {
   version: 5,
@@ -70,9 +70,6 @@ let tapeRedo = [];
 
 // Fake MIDI devices for ease of development.
 
-let pitchShifter = new Tone.PitchShift(0).toDestination();
-let synth = new Tone.PolySynth(Tone.Synth).toDestination();
-synth.connect(pitchShifter);
 let metronome_synth = new Tone.Synth({
   volume: -6,
 }).toDestination();
@@ -82,23 +79,58 @@ metronome_synth.envelope.decay = 0;
 metronome_synth.envelope.sustain = 0.1;
 
 let fakeOutput = {
-  name: "Dummy Synth",
+  name: "Tiny Synth",
 };
 
-fakeOutput.playNote = function (note_name, channel, options) {
-  synth.triggerAttack(note_name, Tone.context.currentTime, options.velocity ?? 1);
+const tinySynth = JZZ.synth.Tiny()
+  .or(function(){ alert('Cannot open MIDI-Out! ' + this.err()); });
+// general midi instrument mappings for "Tiny Synth" output
+[
+  0,    // channel 1  <- acoustic grand piano
+  8,    // channel 2  <- celesta
+  16,   // channel 3  <- drawbar organ
+  25,   // channel 4  <- acoustic guitar (steel)
+  32,   // channel 5  <- acoustic bass
+  40,   // channel 6  <- violin
+  55,   // channel 7  <- trumpet
+  68,   // channel 8  <- oboe
+  72,   // channel 9 <- piccolo
+  null, // channel 10  <- percussion/drums
+  80,   // channel 11 <- lead 1 (square)
+  83,   // channel 12 <- lead 4 (chiff)
+  85,   // channel 13 <- lead 6 (voice)
+  87,   // channel 14 <- lead 8 (bass + lead)
+  89,   // channel 15 <- pad 2 (warm)
+  115,  // channel 16 <- woodblock
+].forEach((instrument, synthChannel) => {
+  if (synthChannel !== 9){
+    tinySynth.ch(synthChannel).program(instrument);
+  }
+});
+
+fakeOutput.playNote = async function (note_name, channel, options) {
+  // synth.triggerAttack(note_name, Tone.context.currentTime, options.velocity ?? 1);
+  tinySynth.noteOn(channel - 1, note_name, options.velocity * 127);
 };
 
 fakeOutput.stopNote = function (note_name, channel) {
-  if (note_name === "all") {
-    synth.releaseAll();
+  if (note_name === "all" && !isNaN(channel)) {
+    tinySynth.allSoundOff(channel - 1);
+  } else if (note_name === "all") {
+    tinySynth.reset();
   } else {
-    synth.triggerRelease(note_name);
+    tinySynth.noteOff(channel - 1, note_name);
   }
 };
 
 fakeOutput.sendPitchBend = function (value, channel) {
-  pitchShifter.pitch = value;
+  if (isNaN(channel)) {
+    for (let ch = 0; ch < 16; ch++) {
+      tinySynth.pitchBend(ch, value ?? 0);
+    }
+  } else {
+    tinySynth.pitchBend(channel - 1, value ?? 0);
+  }
 };
 
 fakeOutput.sendControlChange = function (name, value) {};
@@ -1420,7 +1452,6 @@ function getStepPixelPosition(step) {
 }
 
 function toggleModifierShortcuts(on) {
-  console.log(document.getElementsByClassName("shortcut-without-modifier"));
   [...document.getElementsByClassName("shortcut-without-modifier")].forEach(elem => {elem.style.display = on ? "none" : "inline-block"});
   [...document.getElementsByClassName("shortcut-with-modifier")].forEach(elem => {elem.style.display = on ? "inline-block" : "none"});
 }
@@ -1460,7 +1491,7 @@ function renderStatus() {
     outputElem.setAttribute("class", "output-device");
     outputElem.innerHTML = `<b>Track ${
       index + 1
-    }</b>&nbsp;&nbsp;&nbsp;<span></span>`;
+    }</b>&nbsp;&nbsp;&nbsp;<span></span> <span class="hint">– <span class="key">${index + 1}</span> + <span class="key">←</span>/<span class="key">→</span> to switch</span>`;
     outputElem.children[1].innerText = `${getOutputDevice(index).name} (${
       track.outputChannel
     })`;
