@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "http-server -c-1 .",
-    "prettier": "prettier --write *.html *.js *.css",
+    "prettier": "prettier --write .",
     "postinstall": "cp node_modules/jzz/javascript/JZZ.js lib && cp node_modules/jzz-midi-smf/javascript/JZZ.midi.SMF.js lib && cp node_modules/jzz-synth-tiny/javascript/JZZ.synth.Tiny.js lib && cp node_modules/localforage/dist/localforage.min.js lib && cp node_modules/webmidi/webmidi.min.js lib && cp node_modules/tone/build/Tone.js lib"
   },
   "author": "",
