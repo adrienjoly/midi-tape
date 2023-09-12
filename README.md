@@ -93,7 +93,7 @@ midi-tape when needed.
 ### Using dummy devices
 
 To avoid errors and allow for easier testing of the tool, dummy/fake input and
-output devices are provided for you. The "Dummy Synth" uses Tone.js and
+output devices are provided for you. The "Tiny Synth" uses JZZ and
 supports polyphony and pitch changes. The "Dummy Keyboard" allow you to play
 a C major scale using the keys a, s, d, f, g, h, and j. The k and l keys move
 the octave up and down.

@@ -49,7 +49,7 @@ let lockKeyboard = false;
 
 // A tape is data that should persist.
 let defaultOutputDevice = 0;
-let defaultOuputDeviceName = "Dummy Synth";
+let defaultOuputDeviceName = "Tiny Synth";
 let defaultOutputChannel = 1;
 let tape = {
   version: 5,
@@ -82,7 +82,7 @@ metronome_synth.envelope.decay = 0;
 metronome_synth.envelope.sustain = 0.1;
 
 let fakeOutput = {
-  name: "Dummy Synth",
+  name: "Tiny Synth",
 };
 
 const tinySynth = JZZ.synth.Tiny()
