@@ -150,7 +150,9 @@ body.playing .reel-inner {
 }
 
 #timeline {
-  background: linear-gradient(90deg, #dedede 1%, transparent 1%) 1px 0, #1e1e1e;
+  background:
+    linear-gradient(90deg, #dedede 1%, transparent 1%) 1px 0,
+    #1e1e1e;
   background-size: 100px 1px;
   margin-top: 20px;
   margin-left: 50%;

@@ -240,7 +240,7 @@ function wipeStepData() {
     addTrackData(
       step,
       "noteOff",
-      getUnfinishedNotes().filter((note) => !(note in notesHeld))
+      getUnfinishedNotes().filter((note) => !(note in notesHeld)),
     );
   }
   if (
@@ -287,14 +287,14 @@ function playMetronome(currentStep) {
       "C4",
       0.05,
       Tone.context.currentTime,
-      0.9
+      0.9,
     );
   } else if (currentStep % tape.ppq === 0) {
     metronome_synth.triggerAttackRelease(
       "C3",
       0.05,
       Tone.context.currentTime,
-      0.9
+      0.9,
     );
   }
 }
@@ -352,7 +352,7 @@ function tick() {
     if (typeof track.pitchbend[step] !== "undefined") {
       getOutputDevice(trackNumber).sendPitchBend(
         track.pitchbend[step],
-        track.outputChannel
+        track.outputChannel,
       );
     }
     if (typeof track.controlchange[step] !== "undefined") {
@@ -361,7 +361,7 @@ function tick() {
           getOutputDevice(trackNumber).sendControlChange(
             name,
             track.controlchange[step][name],
-            track.outputChannel
+            track.outputChannel,
           );
         } catch (e) {}
       }
@@ -458,7 +458,7 @@ function addTrackData(setStep, property, data) {
       tape.tracks[currentTrack][property][setStep] = [];
     }
     tape.tracks[currentTrack][property][setStep] = Array.from(
-      new Set(tape.tracks[currentTrack][property][setStep].concat(data))
+      new Set(tape.tracks[currentTrack][property][setStep].concat(data)),
     );
   } else if (typeof data === "object") {
     if (typeof tape.tracks[currentTrack][property][setStep] === "undefined") {
@@ -480,11 +480,11 @@ function setDevicesByName() {
   const outputs = getOutputs();
   for (const track of tape.tracks) {
     track.outputDevice = outputs.findIndex(
-      (output) => output.name === track.outputDeviceName
+      (output) => output.name === track.outputDeviceName,
     );
   }
   tape.inputDevice = getInputs().findIndex(
-    (input) => input.name === tape.inputDeviceName
+    (input) => input.name === tape.inputDeviceName,
   );
 }
 
@@ -536,7 +536,7 @@ function onNoteOn(event) {
     if (quantize) {
       setStep = quantizeStep(setStep, tape.ppq / quantizeLevel);
       const difference = Math.round(
-        (setStep - step) * (quantizeStrength / 100)
+        (setStep - step) * (quantizeStrength / 100),
       );
       setStep = step + difference;
       justQuantized[note] = [step, setStep];
@@ -553,7 +553,7 @@ function onNoteOn(event) {
     tape.tracks[currentTrack].outputChannel,
     {
       velocity: event.velocity,
-    }
+    },
   );
 }
 
@@ -581,7 +581,7 @@ function onNoteOff(event) {
   delete justNoteOn[`${currentTrack}:${note}`];
   getOutputDevice(currentTrack).stopNote(
     note,
-    tape.tracks[currentTrack].outputChannel
+    tape.tracks[currentTrack].outputChannel,
   );
 }
 
@@ -595,7 +595,7 @@ function onPitchBend(event) {
   }
   getOutputDevice(currentTrack).sendPitchBend(
     event.value,
-    tape.tracks[currentTrack].outputChannel
+    tape.tracks[currentTrack].outputChannel,
   );
 }
 
@@ -613,7 +613,7 @@ function onControlChange(event) {
     getOutputDevice(currentTrack).sendControlChange(
       event.controller.name,
       event.value,
-      tape.tracks[currentTrack].outputChannel
+      tape.tracks[currentTrack].outputChannel,
     );
   } catch (e) {}
 }
@@ -826,21 +826,21 @@ function paste() {
       addTrackData(
         pasteStep,
         "pitchbend",
-        tape.tracks[currentTrack].pitchbend[i]
+        tape.tracks[currentTrack].pitchbend[i],
       );
     }
     if (typeof tape.tracks[currentTrack].controlchange[i] !== "undefined") {
       addTrackData(
         pasteStep,
         "controlchange",
-        tape.tracks[currentTrack].controlchange[i]
+        tape.tracks[currentTrack].controlchange[i],
       );
     }
   }
   addTrackData(
     step + (endMarker - startMarker),
     "noteOff",
-    getUnfinishedNotes()
+    getUnfinishedNotes(),
   );
   calculateMaxStep();
   renderSegments();
@@ -868,8 +868,8 @@ function save() {
   element.setAttribute(
     "href",
     `data:text/plain;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(tape, null, 2)
-    )}`
+      JSON.stringify(tape, null, 2),
+    )}`,
   );
   element.setAttribute("download", `${tape.name || "midi-tape"}.json`);
   element.style.display = "none";
@@ -900,7 +900,7 @@ function spinCassette(backwards) {
   document.getElementById("cassette").classList = "";
   if (backwards) {
     setTimeout(
-      () => document.getElementById("cassette").classList === "spin-back"
+      () => document.getElementById("cassette").classList === "spin-back",
     );
   } else {
     setTimeout(() => document.getElementById("cassette").classList === "spin");
@@ -910,7 +910,7 @@ function spinCassette(backwards) {
   }
   spinTimeout = setTimeout(
     () => document.getElementById("cassette").classList === "",
-    500
+    500,
   );
 }
 
@@ -921,7 +921,7 @@ function nudgeCassette(backwards) {
   const reels = document.querySelectorAll(".reel-inner");
   reels.forEach(function (reel) {
     let rotation = parseInt(
-      getComputedStyle(reel).getPropertyValue("--rotation")
+      getComputedStyle(reel).getPropertyValue("--rotation"),
     );
     rotation += backwards ? 10 : -10;
     reel.style = `--rotation: ${rotation}`;
@@ -1000,7 +1000,7 @@ function toggleMonitor() {
   if (!microphone) {
     if (
       !confirm(
-        "Are you ready to monitor your browser's default input? If you're not wearing headphones and the default is your microphone, you could be in for a nasty feedback loop."
+        "Are you ready to monitor your browser's default input? If you're not wearing headphones and the default is your microphone, you could be in for a nasty feedback loop.",
       )
     ) {
       return;
@@ -1027,7 +1027,7 @@ function toggleMonitor() {
       },
       () => {
         alert("Error configuring microphone.");
-      }
+      },
     );
   } else {
     doToggleMonitor();
@@ -1095,7 +1095,7 @@ function exportMidi() {
         for (const note in track.noteOn[i]) {
           trk.add(
             midiStep,
-            JZZ.MIDI.noteOn(0, note, 127 * track.noteOn[i][note])
+            JZZ.MIDI.noteOn(0, note, 127 * track.noteOn[i][note]),
           );
         }
       }
@@ -1116,7 +1116,7 @@ function exportMidi() {
           }
           trk.add(
             midiStep,
-            JZZ.MIDI.control(0, controller, track.controlchange[i][name])
+            JZZ.MIDI.control(0, controller, track.controlchange[i][name]),
           );
         }
       }
@@ -1470,12 +1470,12 @@ function toggleModifierShortcuts(on) {
   [...document.getElementsByClassName("shortcut-without-modifier")].forEach(
     (elem) => {
       elem.style.display = on ? "none" : "inline-block";
-    }
+    },
   );
   [...document.getElementsByClassName("shortcut-with-modifier")].forEach(
     (elem) => {
       elem.style.display = on ? "inline-block" : "none";
-    }
+    },
   );
 }
 
@@ -1523,11 +1523,10 @@ function renderStatus() {
     document.getElementById("config").appendChild(outputElem);
   });
   document.getElementById(
-    "input-device"
+    "input-device",
   ).innerHTML = `<b>Input</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span></span> <span class="hint">– <span class="key">i</span> + <span class="key">↑</span>/<span class="key">↓</span> to switch</span>`;
-  document.getElementById(
-    "input-device"
-  ).children[1].innerText = getInputDevice().name;
+  document.getElementById("input-device").children[1].innerText =
+    getInputDevice().name;
 
   startMarkerPx = getStepPixelPosition(startMarker);
   endMarkerPx = getStepPixelPosition(endMarker);
@@ -1543,7 +1542,7 @@ function renderStatus() {
       endMarkerPx - 1
     }px; display: block;`;
     document.getElementById(
-      "timeline-marker-bg"
+      "timeline-marker-bg",
     ).style = `left: ${startMarkerPx}px; width:${
       endMarkerPx - startMarkerPx
     }px;`;
@@ -1576,7 +1575,7 @@ function renderSegments() {
           continue;
         }
         sharedNotes = track.noteOff[j].filter(
-          (note) => note in track.noteOn[i]
+          (note) => note in track.noteOn[i],
         );
         if (sharedNotes.length > 0) {
           segments.push({
@@ -1624,7 +1623,7 @@ function renderTimeline() {
   }
   const timelinePosition = getStepPixelPosition(step);
   document.getElementById(
-    "timeline"
+    "timeline",
   ).style = `${extraStyle} transform: translateX(-${timelinePosition}px); width: calc(100% + ${timelinePosition}px); background-size: ${backgroundSize}px 1px;`;
   const counterText = String(Math.floor(step / tape.ppq)).padStart(4, "0");
   document.getElementById("counter").dataset.count = counterText;
