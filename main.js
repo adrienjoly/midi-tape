@@ -70,9 +70,6 @@ let tapeRedo = [];
 
 // Fake MIDI devices for ease of development.
 
-let pitchShifter = new Tone.PitchShift(0).toDestination();
-let synth = new Tone.PolySynth(Tone.Synth).toDestination();
-synth.connect(pitchShifter);
 let metronome_synth = new Tone.Synth({
   volume: -6,
 }).toDestination();
@@ -87,29 +84,45 @@ let fakeOutput = {
 
 const tinySynth = JZZ.synth.Tiny()
   .or(function(){ alert('Cannot open MIDI-Out! ' + this.err()); });
-tinySynth.ch(1).program(0);  // channel 1 <- piano
-tinySynth.ch(2).program(32); // channel 2 <- bass
-tinySynth.ch(3).program(40); // channel 3 <- violin
-tinySynth.ch(4).program(55); // channel 4 <- trumpet
+// general midi instrument mappings for "Tiny Synth" output
+[
+  0,    // channel 1  <- acoustic grand piano
+  8,    // channel 2  <- celesta
+  16,   // channel 3  <- drawbar organ
+  25,   // channel 4  <- acoustic guitar (steel)
+  32,   // channel 5  <- acoustic bass
+  40,   // channel 6  <- violin
+  55,   // channel 7  <- trumpet
+  68,   // channel 8  <- oboe
+  72,   // channel 9 <- piccolo
+  null, // channel 10  <- percussion/drums
+  80,   // channel 11 <- lead 1 (square)
+  83,   // channel 12 <- lead 4 (chiff)
+  85,   // channel 13 <- lead 6 (voice)
+  87,   // channel 14 <- lead 8 (bass + lead)
+  89,   // channel 15 <- pad 2 (warm)
+  115,  // channel 16 <- woodblock
+].forEach((instrument, synthChannel) => {
+  if (synthChannel !== 9){
+    tinySynth.ch(synthChannel).program(instrument);
+  }
+});
 
 fakeOutput.playNote = async function (note_name, channel, options) {
   // synth.triggerAttack(note_name, Tone.context.currentTime, options.velocity ?? 1);
-  console.log('playNote', {channel, note_name,...options})
-  tinySynth.noteOn(channel, note_name, options.velocity * 127);
+  tinySynth.noteOn(channel - 1, note_name, options.velocity * 127);
 };
 
 fakeOutput.stopNote = function (note_name, channel) {
   if (note_name === "all") {
-    // synth.releaseAll();    
-    tinySynth.allSoundOff(channel)
+    tinySynth.allSoundOff(channel - 1)
   } else {
-    // synth.triggerRelease(note_name);
-    tinySynth.noteOff(channel, note_name);
+    tinySynth.noteOff(channel - 1, note_name);
   }
 };
 
 fakeOutput.sendPitchBend = function (value, channel) {
-  pitchShifter.pitch = value;
+  tinySynth.pitchBend(value);
 };
 
 fakeOutput.sendControlChange = function (name, value) {};
